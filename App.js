@@ -5,18 +5,9 @@ import * as Permissions from 'expo-permissions';
 import { FontAwesome, Ionicons,MaterialCommunityIcons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 
-
-
-
-export default class App extends React.Component {
-  state = {
-    hasPermission: null,
-    cameraType: Camera.Constants.Type.back,
-  }
-
-  async componentDidMount() {
-    this.getPermissionAsync()
-  }
+const App = () => {
+  const [permission, setpermission] = useState(null);
+  const [CameraType, setCameraType] = useState(Camera.Constants.Type.back);
 
   getPermissionAsync = async () => {
     // Camera roll Permission 
@@ -28,22 +19,20 @@ export default class App extends React.Component {
     }
     // Camera Permission
     const { status } = await Permissions.askAsync(Permissions.CAMERA);
-    this.setState({ hasPermission: status === 'granted' });
+    setpermission( status === 'granted' );
   }
 
   handleCameraType=()=>{
-    const { cameraType } = this.state
-
-    this.setState({cameraType:
-      cameraType === Camera.Constants.Type.back
+    setCameraType(
+      CameraType === Camera.Constants.Type.back
       ? Camera.Constants.Type.front
       : Camera.Constants.Type.back
-    })
+    )
   }
 
   takePicture = async () => {
-    if (this.camera) {
-      let photo = await this.camera.takePictureAsync();
+    if (camera) {
+      let photo = await camera.takePictureAsync();
 
     }
   }
@@ -53,62 +42,61 @@ export default class App extends React.Component {
       mediaTypes: ImagePicker.MediaTypeOptions.Images
     });
   }
-  
 
-  render(){
-    const { hasPermission } = this.state
-    if (hasPermission === null) {
-      return <View />;
-    } else if (hasPermission === false) {
-      return <Text>No access to camera</Text>;
-    } else {
-      return (
-          <View style={{ flex: 1 }}>
-            <Camera style={{ flex: 1 }} type={this.state.cameraType}  ref={ref => {this.camera = ref}}>
-              <View style={{flex:1, flexDirection:"row",justifyContent:"space-between",margin:30}}>
-                <TouchableOpacity
-                  style={{
-                    alignSelf: 'flex-end',
-                    alignItems: 'center',
-                    backgroundColor: 'transparent'                 
-                  }}
-                  onPress={()=>this.pickImage()}>
-                  <Ionicons
-                      name="ios-photos"
-                      style={{ color: "#fff", fontSize: 40}}
-                  />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={{
-                    alignSelf: 'flex-end',
-                    alignItems: 'center',
-                    backgroundColor: 'transparent',
-                  }}
-                  onPress={()=>this.takePicture()}
-                  >
-                  <FontAwesome
-                      name="camera"
-                      style={{ color: "#fff", fontSize: 40}}
-                  />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={{
-                    alignSelf: 'flex-end',
-                    alignItems: 'center',
-                    backgroundColor: 'transparent',
-                  }}
-                  onPress={()=>this.handleCameraType()}
-                  >
-                  <MaterialCommunityIcons
-                      name="camera-switch"
-                      style={{ color: "#fff", fontSize: 40}}
-                  />
-                </TouchableOpacity>
-              </View>
-            </Camera>
-        </View>
-      );
-    }
+  useEffect(() => {
+    this.getPermissionAsync()
+  }, [])
+
+  if (permission === null) {
+    return <View />;
+  } else if (permission === false) {
+    return <Text>No access to camera</Text>;
+  } else {
+    return (
+        <View style={{ flex: 1 }}>
+          <Camera style={{ flex: 1 }} type={CameraType}  ref={ref => {camera = ref}}>
+            <View style={{flex:1, flexDirection:"row",justifyContent:"space-between",margin:30}}>
+              <TouchableOpacity
+                style={{
+                  alignSelf: 'flex-end',
+                  alignItems: 'center',
+                  backgroundColor: 'transparent'                 
+                }}
+                onPress={()=>pickImage()}>
+                <Ionicons
+                    name="ios-photos"
+                    style={{ color: "#fff", fontSize: 40}}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{
+                  alignSelf: 'flex-end',
+                  alignItems: 'center',
+                  backgroundColor: 'transparent',
+                }}
+                onPress={()=>takePicture()}
+                >
+                <FontAwesome
+                    name="camera"
+                    style={{ color: "#fff", fontSize: 40}}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{
+                  alignSelf: 'flex-end',
+                  alignItems: 'center',
+                  backgroundColor: 'transparent',
+                }}
+                onPress={()=>handleCameraType()}
+                >
+                <MaterialCommunityIcons
+                    name="camera-switch"
+                    style={{ color: "#fff", fontSize: 40}}
+                />
+              </TouchableOpacity>
+            </View>
+          </Camera>
+      </View>
+    );
   }
-  
 }
